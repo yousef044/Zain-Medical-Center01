@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة الطبيب الذكية - MediCare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- ربط ملف الـ CSS الخارجي -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="wrapper" id="mainWrapper">
+    <div class="brand-header">
+        <div class="brand-icon"><i class="fa-solid fa-user-doctor"></i></div>
+        <h2 id="mainTitle">بوابة الأطباء</h2>
+        <p>النظام الذكي لإدارة المواعيد الطبية</p>
+    </div>
+
+    <!-- قسم الدخول والتسجيل -->
+    <div class="form-panel active" id="authSection">
+        <div class="tabs-nav">
+            <button class="tab-item active" onclick="switchTab('login')"><i class="fa-solid fa-right-to-bracket"></i> دخول</button>
+            <button class="tab-item" onclick="switchTab('register')"><i class="fa-solid fa-user-plus"></i> حساب جديد</button>
+        </div>
+
+        <div id="loginFormContainer" class="sub-form active">
+            <form onsubmit="handleLogin(event)">
+                <div class="input-box">
+                    <label>الاسم الثلاثي للطبيب</label>
+                    <input type="text" id="logName" placeholder="مثال: محمد خالد أحمد">
+                    <i class="fa-solid fa-user-doctor"></i>
+                </div>
+                <div class="input-box">
+                    <label>كلمة المرور (8 خانات على الأقل)</label>
+                    <input type="password" id="logPass" placeholder="••••••••">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <button type="submit" class="btn-main">تسجيل الدخول</button>
+                <div id="logMsg" class="feedback-msg" style="color: var(--danger);"></div>
+            </form>
+        </div>
+
+        <div id="registerFormContainer" class="sub-form" style="display: none;">
+            <form onsubmit="handleRegister(event)">
+                <div class="input-box">
+                    <label>الاسم الثلاثي</label>
+                    <input type="text" id="regName" placeholder="محمد خالد أحمد">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <div class="input-box">
+                    <label>رقم الجوال</label>
+                    <input type="tel" id="regPhone" placeholder="05xxxxxxxx">
+                    <i class="fa-solid fa-phone"></i>
+                </div>
+                <div class="input-box">
+                    <label>التخصص الطبي</label>
+                    <input type="text" id="regSpec" placeholder="طب أسنان، باطنية...">
+                    <i class="fa-solid fa-stethoscope"></i>
+                </div>
+                <div class="input-box">
+                    <label>ساعات العمل</label>
+                    <input type="text" id="regHours" placeholder="مثال: 9 صباحاً - 5 مساءً">
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+                <div class="input-box">
+                    <label>مكان العيادة</label>
+                    <input type="text" id="regClinic" placeholder="المدينة، الحي، المبنى">
+                    <i class="fa-solid fa-location-dot"></i>
+                </div>
+                <div class="input-box">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="regEmail" placeholder="doctor@medicare.com">
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+                <div class="input-box">
+                    <label>كلمة المرور (8 خانات على الأقل)</label>
+                    <input type="password" id="regPass" placeholder="••••••••">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <button type="submit" class="btn-main">إنشاء الحساب</button>
+                <div id="regMsg" class="feedback-msg"></div>
+            </form>
+        </div>
+
+        <div class="switch-page">
+            هل أنت مريض؟ <a href="sick.html">انتقل لبوابة المرضى <i class="fa-solid fa-arrow-left"></i></a>
+        </div>
+    </div>
+
+    <!-- لوحة التحكم -->
+    <div class="dashboard-panel" id="dashboardSection">
+        <div class="dashboard-header">
+            <div>
+                <h3 id="docWelcomeName" style="color: var(--primary-dark); font-size: 20px;">أهلاً بك</h3>
+                <span style="font-size: 13px; color: var(--text-muted);">لوحة متابعة وموافقة حجوزات المرضى</span>
+            </div>
+            <div class="dashboard-actions">
+                <button class="btn-main btn-danger" style="width: auto; padding: 8px 12px; font-size: 13px;" onclick="handleDeleteAccount()"><i class="fa-solid fa-trash-can"></i> حذف الحساب</button>
+                <button class="btn-main" style="width: auto; padding: 8px 12px; font-size: 13px; background: var(--text-muted);" onclick="handleLogout()"><i class="fa-solid fa-power-off"></i> خروج</button>
+            </div>
+        </div>
+
+        <div class="stats-box">
+            <i class="fa-solid fa-calendar-check"></i>
+            <div class="stats-info">
+                <h4>إجمالي المواعيد المسجلة</h4>
+                <span id="totalAppointmentsCount">0</span>
+            </div>
+        </div>
+
+        <div id="appointmentsTableContainer"></div>
+    </div>
+</div>
+
+<!-- ربط ملف الـ JavaScript الخارجي -->
+<script src="script.js"></script>
+</body>
+</html>

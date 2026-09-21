@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بوابة المريض الذكية - MediCare</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0d9488;
+            --primary-dark: #0f766e;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-gradient: linear-gradient(135deg, #f0fdf4 0%, #ccfbf1 100%);
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
+        body { background: var(--bg-gradient); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .wrapper { width: 100%; max-width: 480px; background: var(--card-bg); padding: 35px; border-radius: 24px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05); transition: all 0.4s ease; }
+        .wrapper.dashboard-mode { max-width: 850px; }
+
+        .brand-header { text-align: center; margin-bottom: 25px; }
+        .brand-icon { width: 70px; height: 70px; background: #ccfbf1; color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; margin: 0 auto 15px; }
+        .brand-header h2 { font-size: 24px; font-weight: 900; color: var(--text-main); }
+        .brand-header p { font-size: 14px; color: var(--text-muted); margin-top: 5px; }
+
+        .tabs-nav { display: flex; background: #f1f5f9; padding: 5px; border-radius: 14px; margin-bottom: 25px; }
+        .tab-item { flex: 1; text-align: center; padding: 10px; font-size: 15px; font-weight: 700; cursor: pointer; border-radius: 10px; color: var(--text-muted); border: none; background: transparent; transition: 0.3s; }
+        .tab-item.active { background: #ffffff; color: var(--primary); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+
+        .form-panel, .dashboard-panel { display: none; }
+        .form-panel.active, .dashboard-panel.active { display: block; animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .input-box { margin-bottom: 18px; position: relative; }
+        .input-box label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; color: var(--text-main); }
+        .input-box input, .input-box select { width: 100%; padding: 12px 15px 12px 45px; border: 2px solid var(--border); border-radius: 12px; font-size: 14px; outline: none; background: #f8fafc; transition: 0.3s; }
+        .input-box input:focus, .input-box select:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1); }
+        .input-box input.error-input, .input-box select.error-input { border-color: var(--danger) !important; background: #fef2f2 !important; }
+        .input-box i { position: absolute; left: 16px; top: 40px; color: var(--text-muted); font-size: 16px; }
+
+        .btn-main { width: 100%; padding: 13px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 700; cursor: pointer; transition: 0.3s; box-shadow: 0 10px 15px -3px rgba(13, 148, 136, 0.3); }
+        .btn-main:hover { background: var(--primary-dark); }
+        .btn-danger { background: var(--danger); box-shadow: 0 10px 15px -3px rgba(239, 68, 68, 0.3); }
+        .btn-danger:hover { background: #dc2626; }
+
+        .feedback-msg { text-align: center; margin-top: 12px; font-size: 13px; font-weight: 600; }
+        .switch-page { text-align: center; margin-top: 20px; font-size: 14px; color: var(--text-muted); }
+        .switch-page a { color: var(--primary); text-decoration: none; font-weight: 700; }
+
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid var(--border); padding-bottom: 15px; }
+        .dashboard-actions { display: flex; gap: 10px; }
+        .alert-box { background: #ccfbf1; color: var(--primary-dark); padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 700; margin-bottom: 20px; text-align: center; }
+
+        .section-title { font-size: 16px; font-weight: 800; color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .table-container { overflow-x: auto; margin-bottom: 25px; border-radius: 12px; border: 1px solid var(--border); }
+        .data-table { width: 100%; border-collapse: collapse; text-align: right; background: #fff; }
+        .data-table th, .data-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); font-size: 13px; }
+        .data-table th { background: #f8fafc; color: var(--text-muted); font-weight: 700; }
+        .data-table tr:hover { background: #f1f5f9; }
+
+        .badge { background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; display: inline-block; }
+        .badge.badge-success { background: #ccfbf1; color: var(--primary-dark); }
+        .badge.badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge.badge-warning { background: #fef3c7; color: #92400e; }
+
+        .grid-dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media(max-width: 768px) { .grid-dashboard { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="wrapper" id="mainWrapper">
+    <div class="brand-header">
+        <div class="brand-icon"><i class="fa-solid fa-bed-pulse"></i></div>
+        <h2 id="mainTitle">بوابة المرضى</h2>
+        <p>احجز موعدك الطبيب بكل سهولة وأمان</p>
+    </div>
+
+    <!-- قسم الدخول والتسجيل -->
+    <div class="form-panel active" id="authSection">
+        <div class="tabs-nav">
+            <button class="tab-item active" onclick="switchTab('login')"><i class="fa-solid fa-right-to-bracket"></i> دخول</button>
+            <button class="tab-item" onclick="switchTab('register')"><i class="fa-solid fa-user-plus"></i> حساب جديد</button>
+        </div>
+
+        <div id="loginFormContainer" class="sub-form active">
+            <form onsubmit="handleLogin(event)">
+                <div class="input-box">
+                    <label>الاسم الثلاثي للمريض</label>
+                    <input type="text" id="logName" placeholder="اسمك الثلاثي المسجل">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="input-box">
+                    <label>كلمة المرور (8 خانات على الأقل)</label>
+                    <input type="password" id="logPass" placeholder="••••••••">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <button type="submit" class="btn-main">تسجيل الدخول</button>
+                <div id="logMsg" class="feedback-msg" style="color: var(--danger);"></div>
+            </form>
+        </div>
+
+        <div id="registerFormContainer" class="sub-form" style="display: none;">
+            <form onsubmit="handleRegister(event)">
+                <div class="input-box">
+                    <label>الاسم الثلاثي</label>
+                    <input type="text" id="regName" placeholder="مثال: صالح محمد علي">
+                    <i class="fa-solid fa-user-plus"></i>
+                </div>
+                <div class="input-box">
+                    <label>رقم الجوال</label>
+                    <input type="tel" id="regPhone" placeholder="05xxxxxxxx">
+                    <i class="fa-solid fa-phone"></i>
+                </div>
+                <div class="input-box">
+                    <label>البريد الإلكتروني</label>
+                    <input type="email" id="regEmail" placeholder="name@example.com">
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+                <div class="input-box">
+                    <label>كلمة المرور (8 خانات على الأقل)</label>
+                    <input type="password" id="regPass" placeholder="••••••••">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <button type="submit" class="btn-main">إنشاء الحساب</button>
+                <div id="regMsg" class="feedback-msg"></div>
+            </form>
+        </div>
+
+        <div class="switch-page">
+            هل أنت طبيب؟ <a href="doctor.html">انتقل لبوابة الأطباء <i class="fa-solid fa-arrow-right"></i></a>
+        </div>
+    </div>
+
+    <!-- لوحة المريض وقائمة الحجوزات -->
+    <div class="dashboard-panel" id="dashboardSection">
+        <div class="dashboard-header">
+            <div>
+                <h3 id="patientWelcomeName" style="color: var(--primary-dark); font-size: 19px;">مرحباً بك</h3>
+                <span style="font-size: 13px; color: var(--text-muted);">إدارة وحجز المواعيد الطبية</span>
+            </div>
+            <div class="dashboard-actions">
+                <button class="btn-main btn-danger" style="width: auto; padding: 8px 12px; font-size: 13px;" onclick="handleDeleteAccount()"><i class="fa-solid fa-trash-can"></i> حذف الحساب</button>
+                <button class="btn-main" style="width: auto; padding: 8px 12px; font-size: 13px; background: var(--text-muted);" onclick="handleLogout()"><i class="fa-solid fa-power-off"></i> خروج</button>
+            </div>
+        </div>
+
+        <div class="alert-box">
+            <i class="fa-solid fa-circle-info"></i> يتم إرسال طلب الحجز بحالة "قيد الانتظار" لحين مراجعته والموافقة عليه من قبل الطبيب.
+        </div>
+
+        <div class="grid-dashboard">
+            <!-- نموذج الحجز -->
+            <div>
+                <div class="section-title"><i class="fa-solid fa-calendar-plus" style="color: var(--primary);"></i> طلب حجز موعد جديد</div>
+                <form onsubmit="handleBooking(event)" id="bookingForm">
+                    <div class="input-box">
+                        <label>اختر الطبيب المعالج</label>
+                        <select id="doctorSelect">
+                            <option value="">-- اختر طبيب من القائمة --</option>
+                        </select>
+                        <i class="fa-solid fa-stethoscope"></i>
+                    </div>
+                    <div class="input-box">
+                        <label>تاريخ الموعد</label>
+                        <input type="date" id="appointmentDate">
+                        <i class="fa-solid fa-calendar-days"></i>
+                    </div>
+                    <div class="input-box">
+                        <label>ساعة الحجز</label>
+                        <select id="appointmentTime">
+                            <option value="">-- اختر ساعة الحجز --</option>
+                            <option value="09:00 صباحاً">09:00 صباحاً</option>
+                            <option value="10:00 صباحاً">10:00 صباحاً</option>
+                            <option value="11:00 صباحاً">11:00 صباحاً</option>
+                            <option value="12:00 ظهراً">12:00 ظهراً</option>
+                            <option value="01:00 عصراً">01:00 عصراً</option>
+                            <option value="02:00 عصراً">02:00 عصراً</option>
+                            <option value="03:00 عصراً">03:00 عصراً</option>
+                            <option value="04:00 عصراً">04:00 عصراً</option>
+                            <option value="05:00 مساءً">05:00 مساءً</option>
+                            <option value="06:00 مساءً">06:00 مساءً</option>
+                            <option value="07:00 مساءً">07:00 مساءً</option>
+                            <option value="08:00 مساءً">08:00 مساءً</option>
+                            <option value="09:00 مساءً">09:00 مساءً</option>
+                        </select>
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <button type="submit" class="btn-main"><i class="fa-solid fa-paper-plane"></i> إرسال الطلب</button>
+                    <div id="bookingMsg" class="feedback-msg"></div>
+                </form>
+            </div>
+
+            <!-- قائمة حجوزات المريض -->
+            <div>
+                <div class="section-title"><i class="fa-solid fa-list-check" style="color: var(--primary);"></i> سجل حجوزاتي الطبية</div>
+                <div id="patientAppointmentsContainer">
+                    <!-- يتم تعبئتها ديناميكياً -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function clearErrors(formType) {
+        let container;
+        if (formType === 'login') container = document.getElementById('loginFormContainer');
+        else if (formType === 'register') container = document.getElementById('registerFormContainer');
+        else container = document.getElementById('bookingForm');
+        
+        container.querySelectorAll('input, select').forEach(el => el.classList.remove('error-input'));
+    }
+
+    function switchTab(tabType) {
+        document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+        if(tabType === 'login') {
+            document.querySelectorAll('.tab-item')[0].classList.add('active');
+            document.getElementById('loginFormContainer').style.display = 'block';
+            document.getElementById('registerFormContainer').style.display = 'none';
+        } else {
+            document.querySelectorAll('.tab-item')[1].classList.add('active');
+            document.getElementById('loginFormContainer').style.display = 'none';
+            document.getElementById('registerFormContainer').style.display = 'block';
+        }
+    }
+
+    function handleRegister(e) {
+        e.preventDefault();
+        clearErrors('register');
+        const nameField = document.getElementById('regName');
+        const phoneField = document.getElementById('regPhone');
+        const emailField = document.getElementById('regEmail');
+        const passField = document.getElementById('regPass');
+
+        let hasError = false;
+        if(!nameField.value.trim()) { nameField.classList.add('error-input'); hasError = true; }
+        if(!phoneField.value.trim()) { phoneField.classList.add('error-input'); hasError = true; }
+        if(!emailField.value.trim()) { emailField.classList.add('error-input'); hasError = true; }
+        if(!passField.value) { passField.classList.add('error-input'); hasError = true; }
+
+        if (hasError) {
+            showMsg('regMsg', 'جميع الخانات إجبارية وتم تمييز الحقول الفارغة.', 'var(--danger)');
+            return;
+        }
+
+        if (passField.value.length < 8) {
+            passField.classList.add('error-input');
+            showMsg('regMsg', 'كلمة المرور يجب ألا تقل عن 8 خانات.', 'var(--danger)');
+            return;
+        }
+
+        let patients = JSON.parse(localStorage.getItem('medicare_patients')) || [];
+        let doctors = JSON.parse(localStorage.getItem('medicare_doctors')) || [];
+        
+        if(patients.some(p => p.name === nameField.value.trim())) {
+            nameField.classList.add('error-input');
+            showMsg('regMsg', 'خطأ: هذا الاسم الثلاثي مسجل مسبقاً.', 'var(--danger)');
+            return;
+        }
+
+        const emailVal = emailField.value.trim();
+        if(patients.some(p => p.email === emailVal) || doctors.some(d => d.email === emailVal)) {
+            emailField.classList.add('error-input');
+            showMsg('regMsg', 'خطأ: البريد الإلكتروني مستخدم مسبقاً.', 'var(--danger)');
+            return;
+        }
+
+        patients.push({
+            name: nameField.value.trim(),
+            phone: phoneField.value.trim(),
+            email: emailVal,
+            pass: passField.value
+        });
+        localStorage.setItem('medicare_patients', JSON.stringify(patients));
+
+        showMsg('regMsg', 'تم إنشاء الحساب بنجاح! جاري تحويلك للدخول...', 'var(--success)');
+        setTimeout(() => switchTab('login'), 1500);
+    }
+
+    function handleLogin(e) {
+        e.preventDefault();
+        clearErrors('login');
+        const nameField = document.getElementById('logName');
+        const passField = document.getElementById('logPass');
+
+        let hasError = false;
+        if(!nameField.value.trim()) { nameField.classList.add('error-input'); hasError = true; }
+        if(!passField.value) { passField.classList.add('error-input'); hasError = true; }
+
+        if (hasError) {
+            showMsg('logMsg', 'الرجاء تعبئة كافة الحقول الفارغة.', 'var(--danger)');
+            return;
+        }
+
+        let patients = JSON.parse(localStorage.getItem('medicare_patients')) || [];
+        const patient = patients.find(p => p.name === nameField.value.trim() && p.pass === passField.value);
+
+        if(patient) {
+            localStorage.setItem('medicare_current_patient', JSON.stringify(patient));
+            openDashboard(patient);
+        } else {
+            nameField.classList.add('error-input');
+            passField.classList.add('error-input');
+            showMsg('logMsg', 'خطأ في اسم المريض أو كلمة المرور.', 'var(--danger)');
+        }
+    }
+
+    function showMsg(elementId, text, color) {
+        const el = document.getElementById(elementId);
+        el.style.color = color;
+        el.innerText = text;
+    }
+
+    function openDashboard(patient) {
+        document.getElementById('authSection').classList.remove('active');
+        document.getElementById('dashboardSection').classList.add('active');
+        document.getElementById('mainWrapper').classList.add('dashboard-mode');
+        document.getElementById('mainTitle').innerText = 'بوابة المريض';
+        document.getElementById('patientWelcomeName').innerText = 'مرحباً، ' + patient.name;
+
+        const todayStr = new Date().toISOString().split('T')[0];
+        document.getElementById('appointmentDate').setAttribute('min', todayStr);
+
+        populateDoctorsDropdown();
+        renderPatientAppointments(patient.name);
+    }
+
+    function populateDoctorsDropdown() {
+        const select = document.getElementById('doctorSelect');
+        let doctors = JSON.parse(localStorage.getItem('medicare_doctors')) || [];
+
+        select.innerHTML = '<option value="">-- اختر طبيب من القائمة --</option>';
+        doctors.forEach(doc => {
+            let opt = document.createElement('option');
+            opt.value = doc.name;
+            opt.textContent = `${doc.name} (${doc.spec})`;
+            select.appendChild(opt);
+        });
+    }
+
+    function handleBooking(e) {
+        e.preventDefault();
+        clearErrors('booking');
+        const doctorField = document.getElementById('doctorSelect');
+        const dateField = document.getElementById('appointmentDate');
+        const timeField = document.getElementById('appointmentTime');
+        const currentPatient = JSON.parse(localStorage.getItem('medicare_current_patient'));
+
+        let hasError = false;
+        if(!doctorField.value) { doctorField.classList.add('error-input'); hasError = true; }
+        if(!dateField.value) { dateField.classList.add('error-input'); hasError = true; }
+        if(!timeField.value) { timeField.classList.add('error-input'); hasError = true; }
+
+        if (hasError) {
+            showMsg('bookingMsg', 'جميع حقول الحجز إجبارية وتم تعليمها باللون الأحمر.', 'var(--danger)');
+            return;
+        }
+
+        const todayStr = new Date().toISOString().split('T')[0];
+        if (dateField.value < todayStr) {
+            dateField.classList.add('error-input');
+            showMsg('bookingMsg', 'عذراً، لا يمكن اختيار تاريخ قديم للحجز.', 'var(--danger)');
+            return;
+        }
+
+        let appointments = JSON.parse(localStorage.getItem('medicare_appointments')) || [];
+        
+        appointments.push({
+            doctor: doctorField.value,
+            patientName: currentPatient.name,
+            patientContact: `${currentPatient.phone} / ${currentPatient.email}`,
+            date: dateField.value,
+            time: timeField.value,
+            status: 'قيد الانتظار'
+        });
+
+        localStorage.setItem('medicare_appointments', JSON.stringify(appointments));
+
+        showMsg('bookingMsg', 'تم إرسال طلب الحجز بنجاح وهو بانتظار موافقة الطبيب!', 'var(--success)');
+        
+        // إعادة تعيين الحقول وتحديث قائمة المريض
+        doctorField.value = '';
+        dateField.value = '';
+        timeField.value = '';
+        renderPatientAppointments(currentPatient.name);
+    }
+
+    function renderPatientAppointments(patientName) {
+        let appointments = JSON.parse(localStorage.getItem('medicare_appointments')) || [];
+        let myAppointments = appointments.filter(a => a.patientName === patientName);
+        const container = document.getElementById('patientAppointmentsContainer');
+
+        if(myAppointments.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; padding: 30px; color: var(--text-muted); background: #f8fafc; border-radius: 12px; border: 1px solid var(--border);">
+                    <i class="fa-regular fa-folder-open" style="font-size: 32px; margin-bottom: 8px; color: #cbd5e1;"></i>
+                    <p style="font-size: 13px;">ليس لديك أي مواعيد محجوزة حتى الآن.</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = `
+            <div class="table-container" style="max-height: 320px; overflow-y: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>الطبيب</th>
+                            <th>الموعد</th>
+                            <th>الحالة</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        myAppointments.forEach(item => {
+            let badgeClass = "badge";
+            let statusText = item.status || "قيد الانتظار";
+            
+            if (statusText === "قيد الانتظار") badgeClass = "badge badge-warning";
+            else if (statusText === "مؤكد" || statusText === "مكتمل") badgeClass = "badge badge-success";
+            else if (statusText === "ملغي") badgeClass = "badge badge-danger";
+
+            html += `
+                <tr>
+                    <td><strong>د. ${item.doctor}</strong></td>
+                    <td>${item.date}<br><small style="color: var(--text-muted);">${item.time}</small></td>
+                    <td><span class="${badgeClass}">${statusText}</span></td>
+                </tr>
+            `;
+        });
+
+        html += `</tbody></table></div>`;
+        container.innerHTML = html;
+    }
+
+    function handleDeleteAccount() {
+        if(confirm('هل أنت متأكد من رغبتك في حذف حسابك النهائي؟')) {
+            const currentPat = JSON.parse(localStorage.getItem('medicare_current_patient'));
+            let patients = JSON.parse(localStorage.getItem('medicare_patients')) || [];
+            patients = patients.filter(p => p.name !== currentPat.name);
+            localStorage.setItem('medicare_patients', JSON.stringify(patients));
+
+            let appointments = JSON.parse(localStorage.getItem('medicare_appointments')) || [];
+            appointments = appointments.filter(a => a.patientName !== currentPat.name);
+            localStorage.setItem('medicare_appointments', JSON.stringify(appointments));
+
+            handleLogout();
+        }
+    }
+
+    function handleLogout() {
+        localStorage.removeItem('medicare_current_patient');
+        document.getElementById('dashboardSection').classList.remove('active');
+        document.getElementById('authSection').classList.add('active');
+        document.getElementById('mainWrapper').classList.remove('dashboard-mode');
+        document.getElementById('mainTitle').innerText = 'بوابة المرضى';
+        document.getElementById('logName').value = '';
+        document.getElementById('logPass').value = '';
+        document.getElementById('logMsg').innerText = '';
+        clearErrors('login');
+    }
+
+    window.onload = function() {
+        const activePat = JSON.parse(localStorage.getItem('medicare_current_patient'));
+        if(activePat) {
+            openDashboard(activePat);
+        }
+    }
+</script>
+</body>
+</html>
